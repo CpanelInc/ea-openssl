@@ -6,7 +6,9 @@ AutoReqProv: no
 Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2k
-Release:    2%{?dist}
+# Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
+%define release_prefix 5
+Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
 URL:        https://www.openssl.org/
@@ -53,8 +55,10 @@ support various cryptographic algorithms and protocols.
 %patch2 -p1 -b .chacha20_poly1305
 
 %build
-./config --prefix=/opt/ea4/openssl --openssldir=/opt/ea4/openssl no-ssl2 no-ssl3 no-shared -fPIC
-
+./config \
+	--prefix=/opt/cpanel/ea-openssl \
+	--openssldir=/opt/cpanel/ea-openssl \
+	no-ssl2 no-ssl3 no-shared -fPIC
 
 make depend
 make all
@@ -64,7 +68,7 @@ make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 
-install -d $RPM_BUILD_ROOT/opt/ea4/openssl/ssl/openssl1.0.2
+install -d $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/ssl/openssl1.0.2
 
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 
@@ -75,15 +79,18 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 
 %files
 %defattr(-,root,root,-)
-%dir /opt/ea4/openssl/
-/opt/ea4/openssl/*
+%dir /opt/cpanel/ea-openssl/
+/opt/cpanel/ea-openssl/*
 
 %files devel
 %defattr(-,root,root)
-/opt/ea4/openssl/include/openssl/
+/opt/cpanel/ea-openssl/include/openssl/
 
 
 %post
 
 %postun
 
+%changelog
+* Thu Jun 08 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 1.0.2k-5
+- Move from experimental to production
