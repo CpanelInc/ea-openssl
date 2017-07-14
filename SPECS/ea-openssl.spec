@@ -7,7 +7,7 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2k
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 5
+%define release_prefix 6
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -18,7 +18,6 @@ BuildRoot:  %{_tmppath}/openssl-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Build changes
 Patch1: openssl-1.0.2a-enginesdir.patch
-Patch2: openssl__chacha20_poly1305.patch
 
 Provides: ea-openssl
 
@@ -52,7 +51,6 @@ support various cryptographic algorithms and protocols.
 %setup -q -n openssl-%{version}
 
 %patch1 -p1 -b .enginesdir
-%patch2 -p1 -b .chacha20_poly1305
 
 %build
 ./config \
@@ -92,5 +90,8 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 %postun
 
 %changelog
+* Fri Jul 14 2017 Cory McIntire <cory@cpanel.net> - 1.0.2k-6
+- EA-6544: remove CloudFlare patch to stop website breakage
+
 * Thu Jun 08 2017 Jacob Perkins <jacob.perkins@cpanel.net> - 1.0.2k-5
 - Move from experimental to production
