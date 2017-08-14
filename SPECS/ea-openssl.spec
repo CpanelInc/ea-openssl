@@ -1,5 +1,9 @@
 AutoReqProv: no
 %define debug_package %{nil}
+%define pkg_base ea-openssl
+%define provider cpanel
+%global _prefix   /opt/%{provider}/%{pkg_base}
+%global _sysconfdir %{_prefix}/etc
 
 # end of distribution specific definitions
 
@@ -7,7 +11,7 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2k
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 6
+%define release_prefix 7
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -54,8 +58,8 @@ support various cryptographic algorithms and protocols.
 
 %build
 ./config \
-	--prefix=/opt/cpanel/ea-openssl \
-	--openssldir=/opt/cpanel/ea-openssl \
+	--prefix=%{_prefix} \
+    --openssldir=%{_sysconfdir}/pki/tls \
 	no-ssl2 no-ssl3 no-shared -fPIC
 
 make depend
@@ -70,6 +74,14 @@ install -d $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/ssl/openssl1.0.2
 
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 
+## Symlink to system certs
+
+%__rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/{cert.pem,certs,misc,private}
+%__ln_s /etc/pki/tls/cert.pem $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/
+%__ln_s /etc/pki/tls/certs $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/
+%__ln_s /etc/pki/tls/misc $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/
+%__ln_s /etc/pki/tls/private $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/
+
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
 
@@ -79,6 +91,12 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 %defattr(-,root,root,-)
 %dir /opt/cpanel/ea-openssl/
 /opt/cpanel/ea-openssl/*
+%dir %{_sysconfdir}/pki/tls
+%{_sysconfdir}/pki/tls/certs
+%{_sysconfdir}/pki/tls/misc
+%{_sysconfdir}/pki/tls/private
+%{_sysconfdir}/pki/tls/cert.pem
+%config(noreplace) %{_sysconfdir}/pki/tls/openssl.cnf
 
 %files devel
 %defattr(-,root,root)
@@ -90,6 +108,9 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 %postun
 
 %changelog
+* Mon Aug 14 2017 Cory McIntire <cory@cpanel.net> - 1.0.2k-7
+- EA-6671: add symlinks to system default certs
+
 * Fri Jul 14 2017 Cory McIntire <cory@cpanel.net> - 1.0.2k-6
 - EA-6544: remove CloudFlare patch to stop website breakage
 
