@@ -9,9 +9,9 @@ AutoReqProv: no
 
 Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
-Version:    1.0.2k
+Version:    1.0.2m
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 7
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -108,6 +108,9 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 %postun
 
 %changelog
+* Thu Nov 02 2017 Cory McIntire <cory@cpanel.net> - 1.0.2m-1
+- EA-6951: Update ea-openssl from 1.0.2k to 1.0.2m
+
 * Mon Aug 14 2017 Cory McIntire <cory@cpanel.net> - 1.0.2k-7
 - EA-6671: add symlinks to system default certs
 
