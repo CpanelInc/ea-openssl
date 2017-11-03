@@ -11,7 +11,7 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2m
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -90,7 +90,11 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 %files
 %defattr(-,root,root,-)
 %dir /opt/cpanel/ea-openssl/
-/opt/cpanel/ea-openssl/*
+/opt/cpanel/ea-openssl/bin
+/opt/cpanel/ea-openssl/lib
+%docdir /opt/cpanel/ea-openssl/man
+/opt/cpanel/ea-openssl/ssl
+/opt/cpanel/ea-openssl/etc
 %dir %{_sysconfdir}/pki/tls
 %{_sysconfdir}/pki/tls/certs
 %{_sysconfdir}/pki/tls/misc
@@ -100,14 +104,16 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 
 %files devel
 %defattr(-,root,root)
-/opt/cpanel/ea-openssl/include/openssl/
-
+/opt/cpanel/ea-openssl/include
 
 %post
 
 %postun
 
 %changelog
+* Fri Nov 03 2017 Dan Muey <dan@cpanel.net> - 1.0.2m-2
+- EA-6953: fix %files so only -devel owns includes
+
 * Thu Nov 02 2017 Cory McIntire <cory@cpanel.net> - 1.0.2m-1
 - EA-6951: Update ea-openssl from 1.0.2k to 1.0.2m
 
