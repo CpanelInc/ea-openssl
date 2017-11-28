@@ -11,7 +11,7 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2m
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -74,6 +74,10 @@ install -d $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/ssl/openssl1.0.2
 
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 
+# so PHP et all can find it on 64 bit machines
+rm -f $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
+ln -s /opt/cpanel/ea-openssl/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
+
 ## Symlink to system certs
 
 %__rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/{cert.pem,certs,misc,private}
@@ -92,6 +96,7 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 %dir /opt/cpanel/ea-openssl/
 /opt/cpanel/ea-openssl/bin
 /opt/cpanel/ea-openssl/lib
+/opt/cpanel/ea-openssl/lib64
 %docdir /opt/cpanel/ea-openssl/man
 /opt/cpanel/ea-openssl/ssl
 /opt/cpanel/ea-openssl/etc
@@ -111,6 +116,9 @@ make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 %postun
 
 %changelog
+* Tue Nov 07 2017 Dan Muey <dan@cpanel.net> - 1.0.2m-3
+- EA-6812: add lib64 symlink so PHP can find what it needs
+
 * Fri Nov 03 2017 Dan Muey <dan@cpanel.net> - 1.0.2m-2
 - EA-6953: fix %files so only -devel owns includes
 
