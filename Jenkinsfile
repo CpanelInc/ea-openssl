@@ -24,11 +24,14 @@ if ( !env.BRANCH_NAME.equals('master') && !env.BRANCH_NAME.equals('production') 
     ])
 }
 
+env.EA_TOOLS_LAB_PREV_COMMIT = 'HEAD~'
+env.EA_TOOLS_LAB_REMOTE = 'ssh://git@enterprise.cpanel.net:7999/pax/ea-tools.git'
+
 // fileLoader implicitly uses an executor, so ensure this invocation is outside
 // the 'node' block; otherwise, you risk resource starvation
 def ea4 = fileLoader.fromGit([
     'jenkins/ea4-lib',
-    'ssh://git@enterprise.cpanel.net:7999/ea4/ea-tools.git',
+    'ssh://git@enterprise.cpanel.net:7999/pax/ea-tools.git',
     params.EA_TOOLS_BRANCH ?: 'master',
     env.CREDENTIALS_ID_FOR_MAIN_REPOSITORY_HOST,
     ''
