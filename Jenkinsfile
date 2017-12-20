@@ -38,4 +38,3 @@ def ea4 = fileLoader.fromGit([
 ])
 
 node('tool:OBS && project:EA4') { ea4.modulino() }
-
