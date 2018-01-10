@@ -9,9 +9,9 @@ AutoReqProv: no
 
 Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
-Version:    1.0.2m
+Version:    1.0.2n
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -116,6 +116,9 @@ ln -s /opt/cpanel/ea-openssl/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun
 
 %changelog
+* Tue Jan 09 2018 Cory McIntire <cory@cpanel.net> - 1.0.2n-1
+- EA-7086: Update ea-openssl from 1.0.2m to 1.0.2n for CVE-2017-3737
+
 * Tue Nov 07 2017 Dan Muey <dan@cpanel.net> - 1.0.2m-3
 - EA-6812: add lib64 symlink so PHP can find what it needs
 
