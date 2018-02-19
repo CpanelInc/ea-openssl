@@ -11,7 +11,7 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2n
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -60,7 +60,7 @@ support various cryptographic algorithms and protocols.
 ./config \
 	--prefix=%{_prefix} \
     --openssldir=%{_sysconfdir}/pki/tls \
-	no-ssl2 no-ssl3 no-shared -fPIC
+	no-ssl2 no-ssl3 shared -fPIC
 
 make depend
 make all
@@ -116,6 +116,9 @@ ln -s /opt/cpanel/ea-openssl/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun
 
 %changelog
+* Mon Feb 19 2018 Cory McIntire <cory@cpanel.net> - 1.0.2n-2
+- ZC-3456: Adjust ea-openssl to build shared.
+
 * Tue Jan 09 2018 Cory McIntire <cory@cpanel.net> - 1.0.2n-1
 - EA-7086: Update ea-openssl from 1.0.2m to 1.0.2n for CVE-2017-3737
 
