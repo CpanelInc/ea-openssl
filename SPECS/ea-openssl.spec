@@ -1,4 +1,3 @@
-AutoReqProv: no
 %define debug_package %{nil}
 %define pkg_base ea-openssl
 %define provider cpanel
@@ -60,7 +59,7 @@ support various cryptographic algorithms and protocols.
 ./config \
 	--prefix=%{_prefix} \
     --openssldir=%{_sysconfdir}/pki/tls \
-	no-ssl2 no-ssl3 shared -fPIC
+	no-ssl2 no-ssl3 shared -fPIC \
 
 make depend
 make all
@@ -100,20 +99,17 @@ ln -s /opt/cpanel/ea-openssl/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %docdir /opt/cpanel/ea-openssl/man
 /opt/cpanel/ea-openssl/ssl
 /opt/cpanel/ea-openssl/etc
-%dir %{_sysconfdir}/pki/tls
-%{_sysconfdir}/pki/tls/certs
-%{_sysconfdir}/pki/tls/misc
-%{_sysconfdir}/pki/tls/private
-%{_sysconfdir}/pki/tls/cert.pem
 %config(noreplace) %{_sysconfdir}/pki/tls/openssl.cnf
+%attr(0755,root,root) /opt/cpanel/ea-openssl/lib/libcrypto.so.1.0.0
+%attr(0755,root,root) /opt/cpanel/ea-openssl/lib/libssl.so.1.0.0
 
 %files devel
 %defattr(-,root,root)
 /opt/cpanel/ea-openssl/include
 
-%post
+%post -p /sbin/ldconfig
 
-%postun
+%postun -p /sbin/ldconfig
 
 %changelog
 * Mon Feb 19 2018 Cory McIntire <cory@cpanel.net> - 1.0.2n-2
