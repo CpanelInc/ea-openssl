@@ -1,9 +1,8 @@
-AutoReqProv: no
 %define debug_package %{nil}
 %define pkg_base ea-openssl
 %define provider cpanel
-%global _prefix   /opt/%{provider}/%{pkg_base}
-%global _sysconfdir %{_prefix}/etc
+%global _prefix /opt/%{provider}/%{pkg_base}
+%global _opensslconfdir %{_prefix}/etc
 
 # end of distribution specific definitions
 
@@ -11,13 +10,14 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2n
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
 URL:        https://www.openssl.org/
 Vendor:     OpenSSL
 Source0:    https://www.openssl.org/source/openssl-%{version}.tar.gz
+Source1:	ea-openssl.conf
 BuildRoot:  %{_tmppath}/openssl-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Build changes
@@ -59,8 +59,8 @@ support various cryptographic algorithms and protocols.
 %build
 ./config \
 	--prefix=%{_prefix} \
-    --openssldir=%{_sysconfdir}/pki/tls \
-	no-ssl2 no-ssl3 no-shared -fPIC
+    --openssldir=%{_opensslconfdir}/pki/tls \
+	no-ssl2 no-ssl3 shared -fPIC \
 
 make depend
 make all
@@ -70,21 +70,23 @@ make %{?_smp_mflags}
 %install
 rm -rf $RPM_BUILD_ROOT
 
-install -d $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/ssl/openssl1.0.2
+install -d $RPM_BUILD_ROOT%{_prefix}/ssl/openssl1.0.2
+mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
+install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d/
 
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install
 
 # so PHP et all can find it on 64 bit machines
-rm -f $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
-ln -s /opt/cpanel/ea-openssl/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
+rm -f $RPM_BUILD_ROOT%{_prefix}/lib64
+ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 
 ## Symlink to system certs
 
-%__rm -rf $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/{cert.pem,certs,misc,private}
-%__ln_s /etc/pki/tls/cert.pem $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/
-%__ln_s /etc/pki/tls/certs $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/
-%__ln_s /etc/pki/tls/misc $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/
-%__ln_s /etc/pki/tls/private $RPM_BUILD_ROOT%{_sysconfdir}/pki/tls/
+%__rm -rf $RPM_BUILD_ROOT%{_opensslconfdir}/pki/tls/{cert.pem,certs,misc,private}
+%__ln_s /etc/pki/tls/cert.pem $RPM_BUILD_ROOT%{_opensslconfdir}/pki/tls/
+%__ln_s /etc/pki/tls/certs $RPM_BUILD_ROOT%{_opensslconfdir}/pki/tls/
+%__ln_s /etc/pki/tls/misc $RPM_BUILD_ROOT%{_opensslconfdir}/pki/tls/
+%__ln_s /etc/pki/tls/private $RPM_BUILD_ROOT%{_opensslconfdir}/pki/tls/
 
 %clean
 %{__rm} -rf $RPM_BUILD_ROOT
@@ -93,29 +95,31 @@ ln -s /opt/cpanel/ea-openssl/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 
 %files
 %defattr(-,root,root,-)
-%dir /opt/cpanel/ea-openssl/
-/opt/cpanel/ea-openssl/bin
-/opt/cpanel/ea-openssl/lib
-/opt/cpanel/ea-openssl/lib64
-%docdir /opt/cpanel/ea-openssl/man
-/opt/cpanel/ea-openssl/ssl
-/opt/cpanel/ea-openssl/etc
-%dir %{_sysconfdir}/pki/tls
-%{_sysconfdir}/pki/tls/certs
-%{_sysconfdir}/pki/tls/misc
-%{_sysconfdir}/pki/tls/private
-%{_sysconfdir}/pki/tls/cert.pem
-%config(noreplace) %{_sysconfdir}/pki/tls/openssl.cnf
+%dir %{_prefix}/
+%{_prefix}/bin
+%{_prefix}/lib
+%{_prefix}/lib64
+%docdir %{_prefix}/man
+%{_prefix}/ssl
+%{_prefix}/etc
+%config(noreplace) %{_opensslconfdir}/pki/tls/openssl.cnf
+%attr(0755,root,root) %{_prefix}/lib/libcrypto.so.1.0.0
+%attr(0755,root,root) %{_prefix}/lib/libssl.so.1.0.0
+%dir %{_sysconfdir}/ld.so.conf.d/
+%attr(0644,root,root) %{_sysconfdir}/ld.so.conf.d/ea-openssl.conf
 
 %files devel
 %defattr(-,root,root)
-/opt/cpanel/ea-openssl/include
+%{_prefix}/include
 
-%post
+%post -p /sbin/ldconfig
 
-%postun
+%postun -p /sbin/ldconfig
 
 %changelog
+* Mon Feb 19 2018 Cory McIntire <cory@cpanel.net> - 1.0.2n-2
+- ZC-3456: Adjust ea-openssl to build shared.
+
 * Tue Jan 09 2018 Cory McIntire <cory@cpanel.net> - 1.0.2n-1
 - EA-7086: Update ea-openssl from 1.0.2m to 1.0.2n for CVE-2017-3737
 
