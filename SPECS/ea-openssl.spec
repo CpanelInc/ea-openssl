@@ -121,7 +121,7 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 
 %changelog
 * Wed Mar 21 2018 Rishwanth Yeddula <rish@cpanel.net> - 1.0.2n-3
-- EA-XXXX: Fixing stuff
+- EA-7327: Added further configuration for shared openssl.
 
 * Mon Feb 19 2018 Cory McIntire <cory@cpanel.net> - 1.0.2n-2
 - ZC-3456: Adjust ea-openssl to build shared.
