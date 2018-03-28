@@ -10,14 +10,13 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2n
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
 URL:        https://www.openssl.org/
 Vendor:     OpenSSL
 Source0:    https://www.openssl.org/source/openssl-%{version}.tar.gz
-Source1:	ea-openssl.conf
 BuildRoot:  %{_tmppath}/openssl-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Build changes
@@ -58,9 +57,10 @@ support various cryptographic algorithms and protocols.
 
 %build
 ./config \
-	--prefix=%{_prefix} \
+    -Wl,-rpath=%{_prefix}/%{_lib} \
+    --prefix=%{_prefix} \
     --openssldir=%{_opensslconfdir}/pki/tls \
-	no-ssl2 no-ssl3 shared -fPIC \
+    no-ssl2 no-ssl3 shared -fPIC \
 
 make depend
 make all
@@ -71,10 +71,14 @@ make %{?_smp_mflags}
 rm -rf $RPM_BUILD_ROOT
 
 install -d $RPM_BUILD_ROOT%{_prefix}/ssl/openssl1.0.2
-mkdir -p %{buildroot}%{_sysconfdir}/ld.so.conf.d/
-install -m 644 %{SOURCE1} $RPM_BUILD_ROOT%{_sysconfdir}/ld.so.conf.d/
 
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install
+
+for lib in $RPM_BUILD_ROOT%{_prefix}/lib/*.so ; do
+    chmod 755 ${lib}
+    pwd
+    ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_prefix}/lib/`basename ${lib}`.10
+done
 
 # so PHP et all can find it on 64 bit machines
 rm -f $RPM_BUILD_ROOT%{_prefix}/lib64
@@ -105,8 +109,7 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %config(noreplace) %{_opensslconfdir}/pki/tls/openssl.cnf
 %attr(0755,root,root) %{_prefix}/lib/libcrypto.so.1.0.0
 %attr(0755,root,root) %{_prefix}/lib/libssl.so.1.0.0
-%dir %{_sysconfdir}/ld.so.conf.d/
-%attr(0644,root,root) %{_sysconfdir}/ld.so.conf.d/ea-openssl.conf
+%attr(0755,root,root) %{_prefix}/lib/libssl.so.10
 
 %files devel
 %defattr(-,root,root)
@@ -117,6 +120,9 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun -p /sbin/ldconfig
 
 %changelog
+* Wed Mar 21 2018 Rishwanth Yeddula <rish@cpanel.net> - 1.0.2n-3
+- EA-7327: Added further configuration for shared openssl.
+
 * Mon Feb 19 2018 Cory McIntire <cory@cpanel.net> - 1.0.2n-2
 - ZC-3456: Adjust ea-openssl to build shared.
 
