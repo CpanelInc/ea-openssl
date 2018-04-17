@@ -10,7 +10,7 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2o
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -20,7 +20,14 @@ Source0:    https://www.openssl.org/source/openssl-%{version}.tar.gz
 BuildRoot:  %{_tmppath}/openssl-%{version}-%{release}-root-%(%{__id_u} -n)
 
 # Build changes
-Patch1: openssl-1.0.2a-enginesdir.patch
+Patch1: 0001-Allow-enginesdir-to-be-configurable-in-Configure-pha.patch
+
+# Version symbols
+Patch2: 0002-Ensure-we-build-shared-with-versioned-symbols.patch
+
+# Cache timing vulnerability in RSA Key Generation (CVE-2018-0737)
+# Remove when 1.0.2p is available.
+Patch3: 0003-RSA-key-generation-ensure-BN_mod_inverse-and-BN_mod_.patch
 
 Provides: ea-openssl
 
@@ -54,6 +61,8 @@ support various cryptographic algorithms and protocols.
 %setup -q -n openssl-%{version}
 
 %patch1 -p1 -b .enginesdir
+%patch2 -p1 -b .version
+%patch3 -p1 -b .CVE-2018-0737
 
 %build
 ./config \
@@ -65,7 +74,6 @@ support various cryptographic algorithms and protocols.
 make depend
 make all
 make rehash
-make %{?_smp_mflags}
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -73,12 +81,6 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT%{_prefix}/ssl/openssl1.0.2
 
 make INSTALL_PREFIX=$RPM_BUILD_ROOT install
-
-for lib in $RPM_BUILD_ROOT%{_prefix}/lib/*.so ; do
-    chmod 755 ${lib}
-    pwd
-    ln -s -f `basename ${lib}` $RPM_BUILD_ROOT%{_prefix}/lib/`basename ${lib}`.10
-done
 
 # so PHP et all can find it on 64 bit machines
 rm -f $RPM_BUILD_ROOT%{_prefix}/lib64
@@ -109,7 +111,6 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %config(noreplace) %{_opensslconfdir}/pki/tls/openssl.cnf
 %attr(0755,root,root) %{_prefix}/lib/libcrypto.so.1.0.0
 %attr(0755,root,root) %{_prefix}/lib/libssl.so.1.0.0
-%attr(0755,root,root) %{_prefix}/lib/libssl.so.10
 
 %files devel
 %defattr(-,root,root)
@@ -120,6 +121,10 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun -p /sbin/ldconfig
 
 %changelog
+* Mon Apr 16 2018 Rishwanth Yeddula <rish@cpanel.net> - 1.0.2o-2
+- EA-7382: Ensure we build shared objects with versioned symbols.
+- Applied patch for CVE-2018-0737: Cache timing vulnerability in RSA Key Generation
+
 * Sun Apr 01 2018 Cory McIntire <cory@cpanel.net> - 1.0.2o-1
 - EA-7333: Update ea-openssl from 1.0.2n to 1.0.2o
 - CVE-2018-0739
