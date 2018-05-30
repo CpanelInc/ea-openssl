@@ -10,7 +10,7 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2o
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 2
+%define release_prefix 3
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -65,6 +65,9 @@ support various cryptographic algorithms and protocols.
 %patch3 -p1 -b .CVE-2018-0737
 
 %build
+# Force dependency resolution to pick /usr/bin/perl instead of /bin/perl
+# This helps downstream users of our RPMS (see: EA-7468)
+export PATH="/usr/bin:$PATH"
 ./config \
     -Wl,-rpath=%{_prefix}/%{_lib} \
     --prefix=%{_prefix} \
@@ -121,6 +124,11 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun -p /sbin/ldconfig
 
 %changelog
+* Mon May 29 2018 Rishwanth Yeddula <rish@cpanel.net> - 1.0.2o-3
+- EA-7468: Ensure dependency resolution picks /usr/bin/perl instead
+  of /bin/perl. This helps downstream users of our RPMs as their
+  build environments can be simplified.
+
 * Mon Apr 16 2018 Rishwanth Yeddula <rish@cpanel.net> - 1.0.2o-2
 - EA-7382: Ensure we build shared objects with versioned symbols.
 - Applied patch for CVE-2018-0737: Cache timing vulnerability in RSA Key Generation
