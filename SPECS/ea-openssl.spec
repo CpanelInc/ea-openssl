@@ -8,9 +8,9 @@
 
 Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
-Version:    1.0.2o
+Version:    1.0.2p
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 3
+%define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -24,10 +24,6 @@ Patch1: 0001-Allow-enginesdir-to-be-configurable-in-Configure-pha.patch
 
 # Version symbols
 Patch2: 0002-Ensure-we-build-shared-with-versioned-symbols.patch
-
-# Cache timing vulnerability in RSA Key Generation (CVE-2018-0737)
-# Remove when 1.0.2p is available.
-Patch3: 0003-RSA-key-generation-ensure-BN_mod_inverse-and-BN_mod_.patch
 
 Provides: ea-openssl
 
@@ -62,7 +58,6 @@ support various cryptographic algorithms and protocols.
 
 %patch1 -p1 -b .enginesdir
 %patch2 -p1 -b .version
-%patch3 -p1 -b .CVE-2018-0737
 
 %build
 # Force dependency resolution to pick /usr/bin/perl instead of /bin/perl
@@ -124,6 +119,11 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun -p /sbin/ldconfig
 
 %changelog
+* Mon Aug 27 2018 Cory McIntire <cory@cpanel.net> - 1.0.2p-1
+- EA-7805: Update to 1.0.2p
+- CVE-2018-0732
+- CVE-2018-0737
+
 * Mon May 29 2018 Rishwanth Yeddula <rish@cpanel.net> - 1.0.2o-3
 - EA-7468: Ensure dependency resolution picks /usr/bin/perl instead
   of /bin/perl. This helps downstream users of our RPMs as their
