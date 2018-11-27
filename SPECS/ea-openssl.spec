@@ -8,7 +8,7 @@
 
 Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
-Version:    1.0.2p
+Version:    1.0.2q
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -119,6 +119,11 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun -p /sbin/ldconfig
 
 %changelog
+* Mon Nov 26 2018 Cory McIntire <cory@cpanel.net> - 1.0.2q-1
+- EA-8030: Update to 1.0.2q
+  CVE-2018-5407 Microarchitecture timing vulnerability in ECC scalar multiplication
+  CVE-2018-0734 Timing vulnerability in DSA signature generation
+
 * Mon Aug 27 2018 Cory McIntire <cory@cpanel.net> - 1.0.2p-1
 - EA-7805: Update to 1.0.2p
 - CVE-2018-0732
