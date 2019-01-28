@@ -1,4 +1,3 @@
-%define debug_package %{nil}
 %define pkg_base ea-openssl
 %define provider cpanel
 %global _prefix /opt/%{provider}/%{pkg_base}
@@ -10,7 +9,7 @@ Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
 Version:    1.0.2q
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
-%define release_prefix 1
+%define release_prefix 2
 Release: %{release_prefix}%{?dist}.cpanel
 License:    OpenSSL
 Group:      System Environment/Libraries
@@ -119,6 +118,9 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun -p /sbin/ldconfig
 
 %changelog
+* Fri Jan 18 2019 Cory McIntire <cory@cpanel.net> - 1.0.2q-2
+- EA-8127: Enable Debuginfo RPM generation
+
 * Mon Nov 26 2018 Cory McIntire <cory@cpanel.net> - 1.0.2q-1
 - EA-8030: Update to 1.0.2q
   CVE-2018-5407 Microarchitecture timing vulnerability in ECC scalar multiplication
