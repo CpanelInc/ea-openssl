@@ -1,7 +1,7 @@
-From 0000000000000000000000000000000000000000 Mon Sep 17 00:00:00 2001
+From 37b81be5c72f5390958a7b2d98df1a45a983761b Mon Sep 17 00:00:00 2001
 From: Rishwanth Yeddula <rish@cpanel.net>
 Date: Mon, 16 Apr 2018 12:19:17 -0500
-Subject: [PATCH 1/3] Allow 'enginesdir' to be configurable in Configure phase
+Subject: [PATCH 1/2] Allow 'enginesdir' to be configurable in Configure phase
 
 ---
  Configure        | 9 +++++++--
@@ -9,10 +9,10 @@ Subject: [PATCH 1/3] Allow 'enginesdir' to be configurable in Configure phase
  2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/Configure b/Configure
-index 744b493..dcb5ad5 100755
+index 3846c91..60851df 100755
 --- a/Configure
 +++ b/Configure
-@@ -729,6 +729,7 @@ my $idx_multilib = $idx++;
+@@ -730,6 +730,7 @@ my $idx_multilib = $idx++;
  my $prefix="";
  my $libdir="";
  my $openssldir="";
@@ -20,7 +20,7 @@ index 744b493..dcb5ad5 100755
  my $exe_ext="";
  my $install_prefix= "$ENV{'INSTALL_PREFIX'}";
  my $cross_compile_prefix="";
-@@ -958,6 +959,10 @@ PROCESS_ARGS:
+@@ -959,6 +960,10 @@ PROCESS_ARGS:
  				{
  				$openssldir=$1;
  				}
@@ -31,7 +31,7 @@ index 744b493..dcb5ad5 100755
  			elsif (/^--install.prefix=(.*)$/)
  				{
  				$install_prefix=$1;
-@@ -1209,7 +1214,7 @@ chop $prefix if $prefix =~ /.\/$/;
+@@ -1211,7 +1216,7 @@ chop $prefix if $prefix =~ /.\/$/;
  
  $openssldir=$prefix . "/ssl" if $openssldir eq "";
  $openssldir=$prefix . "/" . $openssldir if $openssldir !~ /(^\/|^[a-zA-Z]:[\\\/])/;
@@ -40,7 +40,7 @@ index 744b493..dcb5ad5 100755
  
  print "IsMK1MF=$IsMK1MF\n";
  
-@@ -1931,7 +1936,7 @@ while (<IN>)
+@@ -1940,7 +1945,7 @@ while (<IN>)
  		}
  	elsif	(/^#define\s+ENGINESDIR/)
  		{
@@ -62,3 +62,6 @@ index 2058ff4..a2c407b 100644
  			  mv -f $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/engines/$$pfx$$l$$sfx.new $(INSTALL_PREFIX)$(INSTALLTOP)/$(LIBDIR)/engines/$$pfx$$l$$sfx ); \
  		done; \
  	fi
+-- 
+2.21.0
+

@@ -7,7 +7,7 @@
 
 Summary:    Cryptography and SSL/TLS Toolkit
 Name:       ea-openssl
-Version:    1.0.2r
+Version:    1.0.2s
 # Doing release_prefix this way for Release allows for OBS-proof versioning, See EA-4544 for more details
 %define release_prefix 1
 Release: %{release_prefix}%{?dist}.cpanel
@@ -118,6 +118,9 @@ ln -s %{_prefix}/lib $RPM_BUILD_ROOT/opt/cpanel/ea-openssl/lib64
 %postun -p /sbin/ldconfig
 
 %changelog
+* Thu Jun 06 2019 Cory McIntire <cory@cpanel.net> - 1.0.2s-1
+- EA-8530: Update ea-openssl from v1.0.2r to v1.0.2s
+
 * Tue Mar 05 2019 Cory McIntire <cory@cpanel.net> - 1.0.2r-1
 - EA-8265: Update openssl to version 1.0.2r
 - https://www.openssl.org/news/secadv/20190226.txt
