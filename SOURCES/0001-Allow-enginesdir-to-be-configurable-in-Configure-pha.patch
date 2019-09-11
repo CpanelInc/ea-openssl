@@ -1,4 +1,4 @@
-From 37b81be5c72f5390958a7b2d98df1a45a983761b Mon Sep 17 00:00:00 2001
+From 3cd20497a1d61dc0ebf4d0c3f39afc833db770c0 Mon Sep 17 00:00:00 2001
 From: Rishwanth Yeddula <rish@cpanel.net>
 Date: Mon, 16 Apr 2018 12:19:17 -0500
 Subject: [PATCH 1/2] Allow 'enginesdir' to be configurable in Configure phase
@@ -9,7 +9,7 @@ Subject: [PATCH 1/2] Allow 'enginesdir' to be configurable in Configure phase
  2 files changed, 8 insertions(+), 3 deletions(-)
 
 diff --git a/Configure b/Configure
-index 3846c91..60851df 100755
+index 494e0b3..07f19e2 100755
 --- a/Configure
 +++ b/Configure
 @@ -730,6 +730,7 @@ my $idx_multilib = $idx++;
