@@ -24,7 +24,7 @@ unless ( caller() ) {
 sub _get_required {
     my ($http) = @_;
 
-    my $res = $http->get("https://www.openssl.org/source/");
+    my $res = $http->get("https://www.openssl.org/source/old/1.0.2/");
     if ( !$res->{success} ) {
         die "Could not GET openssl dist page ($res->{status} $res->{reason})\n";
     }
@@ -44,7 +44,7 @@ sub _get_required {
 sub _add_sum {
     my ( $http, $hr ) = @_;
 
-    my $checksum_url = "https://www.openssl.org/source/$hr->{tarball}{name}.sha256";
+    my $checksum_url = "https://www.openssl.org/source/old/1.0.2/$hr->{tarball}{name}.sha256";
     my $res          = $http->get($checksum_url);
     if ( !$res->{success} ) {
         die "Could not GET openssl SHASUMS page ($res->{status} $res->{reason})\n";
